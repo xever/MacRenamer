@@ -105,7 +105,7 @@ struct ContentView: View {
             .padding(.bottom, 4)
 
             if settings.rules.isEmpty {
-                Text("还没有规则。点击右上角「添加规则」开始")
+                Text("还没有规则。点击右上角「+添加规则」开始 或 按下 ⌥ option")
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
