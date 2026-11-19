@@ -1,0 +1,104 @@
+//
+//  AboutWindow.swift
+//  MacRename
+//
+//  “关于”窗口：显示应用图标、名称、可点击的 GitHub 链接和版本号。
+//
+
+import SwiftUI
+import AppKit
+
+/// 负责显示“关于”窗口。
+/// 用 AppKit 的 NSWindow 承载 SwiftUI 视图，方便从菜单命令里直接调用。
+enum AboutWindow {
+
+    /// 保存窗口实例，避免重复创建（关闭后再次打开可以复用）。
+    private static var window: NSWindow?
+
+    /// 显示“关于”窗口；如果已经存在则直接置于最前。
+    static func show() {
+        if let window = window {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        // 用 SwiftUI 视图作为窗口内容。
+        let hosting = NSHostingView(rootView: AboutView())
+
+        let win = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        win.title = "关于 MacRenamer"
+        win.contentView = hosting
+        win.isReleasedWhenClosed = false   // 关闭时不销毁，方便下次直接复用
+        win.center()
+        window = win
+
+        win.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+}
+
+/// “关于”页面内容。
+struct AboutView: View {
+
+    /// 从 Info.plist 读取版本号，例如 “1.0（1）”。
+    private var versionText: String {
+        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "版本 \(short)（\(build)）"
+    }
+
+    /// 加载打包进 App 的 GitHub 图标。
+    private var githubLogo: NSImage? {
+        // 优先从 App 资源里按名字找，找不到再用完整文件名兜底。
+        if let image = NSImage(named: "github") { return image }
+        if let url = Bundle.main.url(forResource: "github", withExtension: "png") {
+            return NSImage(contentsOf: url)
+        }
+        return nil
+    }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            // 应用图标。
+            if let icon = NSApp.applicationIconImage {
+                Image(nsImage: icon)
+                    .resizable()
+                    .frame(width: 72, height: 72)
+            }
+
+            // 应用名称。
+            Text("MacRenamer")
+                .font(.title2.weight(.semibold))
+
+            // 版本号上面的一行：GitHub 图标 + 可点击的链接。
+            Link(destination: URL(string: "https://github.com/xever/MacRenamer")!) {
+                HStack(spacing: 6) {
+                    if let logo = githubLogo {
+                        Image(nsImage: logo)
+                            .renderingMode(.template)   // 模板渲染，颜色跟随文字，自动适配深浅色
+                            .resizable()
+                            .interpolation(.high)
+                            .frame(width: 16, height: 16)
+                    }
+                    Text("xever @GitHub")
+                        .font(.callout)
+                }
+                .foregroundColor(.accentColor)
+            }
+            .help("在浏览器中打开 https://github.com/xever/MacRenamer")
+
+            // 版本号。
+            Text(versionText)
+                .font(.callout)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 20)
+        .frame(width: 300, height: 200)
+    }
+}

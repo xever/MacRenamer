@@ -30,6 +30,13 @@ struct MacRenameApp: App {
         }
         // 自定义菜单栏：在“文件”菜单里加上“选择文件夹 / 选择文件”等。
         .commands {
+            // 自定义“关于”菜单项：打开我们自己的“关于”窗口（带 GitHub 链接）。
+            CommandGroup(replacing: .appInfo) {
+                Button("关于 MacRenamer") {
+                    AboutWindow.show()
+                }
+            }
+
             // replacing: .newItem 表示替换系统默认的“新建窗口”等菜单项，
             // 换成我们自己的命令。
             CommandGroup(replacing: .newItem) {
