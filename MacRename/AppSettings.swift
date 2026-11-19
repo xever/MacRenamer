@@ -61,6 +61,21 @@ final class AppSettings: ObservableObject {
     /// 全局快捷键监听器（用于 option+数字 添加规则）。
     private var keyMonitor: Any?
 
+    /// 修饰键（flagsChanged）监听器，用于检测“单独按一下 Option”。
+    private var optionMonitor: Any?
+
+    /// Option 键当前是否处于按下状态。
+    private var optionPressed = false
+
+    /// Option 是否被当作修饰键用过（按住 Option 时又按了其它键）。
+    private var optionUsedAsModifier = false
+
+    /// 懒加载的“添加规则”NSMenu（供“单独按一下 Option”时弹出）。
+    private var addRuleNSMenu: NSMenu?
+
+    /// 强引用菜单项的回调对象，避免其被提前释放。
+    private var menuTargets: [MenuTarget] = []
+
     // MARK: - 初始化
 
     init() {
@@ -78,11 +93,25 @@ final class AppSettings: ObservableObject {
     /// 安装全局快捷键监听（只安装一次）。
     private func installShortcutMonitor() {
         guard keyMonitor == nil else { return }
+
+        // 监听普通按键：option+1~6 添加规则。
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self = self else { return event }
+            // 按住 option 时又按了其它键，说明 option 被当作修饰键，
+            // 之后松开 option 时就不再弹出菜单（避免和 option+1 等冲突）。
+            if event.modifierFlags.contains(.option) {
+                self.optionUsedAsModifier = true
+            }
             // 命中快捷键就“吞掉”这个按键（返回 nil），否则原样返回继续传递。
-            if self?.handleShortcut(event) == true {
+            if self.handleShortcut(event) {
                 return nil
             }
+            return event
+        }
+
+        // 监听修饰键（Option）的按下/松开，用于“单独按一下 Option”弹出菜单。
+        optionMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.handleFlagsChanged(event)
             return event
         }
     }
@@ -102,6 +131,48 @@ final class AppSettings: ObservableObject {
         }
         addRule(kind)
         return true
+    }
+
+    /// 处理修饰键变化：检测“单独按一下 Option”来弹出“添加规则”菜单。
+    private func handleFlagsChanged(_ event: NSEvent) {
+        let optionNow = event.modifierFlags.contains(.option)
+        if optionNow && !optionPressed {
+            // Option 刚按下：记录状态，并假设它是“单独按一下”。
+            optionPressed = true
+            optionUsedAsModifier = false
+        } else if !optionNow && optionPressed {
+            // Option 松开：如果中间没有按过其它键，就弹出“添加规则”菜单。
+            optionPressed = false
+            if !optionUsedAsModifier {
+                // 延迟到下一个 runloop 再弹出，避免在事件处理中直接进入模态循环。
+                DispatchQueue.main.async { [weak self] in
+                    self?.showAddRuleMenu()
+                }
+            }
+        }
+    }
+
+    /// 在鼠标当前位置弹出“添加规则”菜单（只构建一次）。
+    private func showAddRuleMenu() {
+        if addRuleNSMenu == nil {
+            let menu = NSMenu(title: "添加规则")
+            menuTargets.removeAll()
+            for kind in RuleKind.allCases {
+                let item = NSMenuItem(
+                    title: "\(kind.displayName)   ⌥\(kind.shortcutNumber)",
+                    action: #selector(MenuTarget.invoke),
+                    keyEquivalent: ""
+                )
+                let target = MenuTarget { [weak self] in
+                    self?.addRule(kind)
+                }
+                item.target = target
+                menuTargets.append(target)   // 强引用，防止 target 被提前释放
+                menu.addItem(item)
+            }
+            addRuleNSMenu = menu
+        }
+        addRuleNSMenu?.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
     }
 
     // MARK: - 规则操作
@@ -459,5 +530,19 @@ final class AppSettings: ObservableObject {
 
     private static func saveHistory(_ history: [String], key: String) {
         UserDefaults.standard.set(history, forKey: key)
+    }
+}
+
+/// 用于 NSMenu 菜单项回调的小工具（NSMenu 的菜单项需要 Objective-C 的 target/action）。
+private final class MenuTarget: NSObject {
+    private let handler: () -> Void
+
+    init(_ handler: @escaping () -> Void) {
+        self.handler = handler
+        super.init()
+    }
+
+    @objc func invoke() {
+        handler()
     }
 }
