@@ -31,6 +31,25 @@
 > 说明：工程没有开启沙盒（App Sandbox），所以可以直接读写任意文件。
 > 签名使用“Sign to Run Locally”（本地 ad-hoc 签名），无需开发者账号。
 > 
+## 打包（通用二进制，同时支持 Intel 和 Apple Silicon）
+
+工程已配置为 Release 打包时生成“通用二进制（universal binary）”，同时包含 `arm64`（Apple Silicon）和 `x86_64`（Intel）两种架构，一个 App 即可在两种 Mac 上运行。
+
+在 Xcode 里打包：
+1. 顶部运行目标选择「Any Mac」。
+2. 菜单 `Product → Archive` 归档，然后 `Distribute App` 导出。
+
+也可以用命令行打包：
+
+```shell
+xcodebuild -project MacRenamer.xcodeproj -scheme MacRenamer \
+  -configuration Release -destination 'generic/platform=macOS' build
+```
+
+- **Release**：`ARCHS = arm64 x86_64`、`ONLY_ACTIVE_ARCH = NO`，打包出双架构。
+- **Debug**：只编译当前机器架构，加快日常调试。
+- 只想打某一种架构时，命令行追加 `ARCHS=arm64` 或 `ARCHS=x86_64` 即可。
+
 ## 代码结构
 
 | 文件 | 作用 |
