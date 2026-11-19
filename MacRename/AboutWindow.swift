@@ -46,6 +46,7 @@ enum AboutWindow {
 /// “关于”页面内容。
 struct AboutView: View {
 
+    @State private var isHovering = false
     /// 从 Info.plist 读取版本号，例如 “1.0（1）”。
     private var versionText: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -88,10 +89,20 @@ struct AboutView: View {
                     }
                     Text("xever @GitHub")
                         .font(.callout)
+                        .cornerRadius(8)
+                        // 模拟 lift 效果的缩放和阴影
+                        .scaleEffect(isHovering ? 1.05 : 1.0)
+                        .shadow(color: isHovering ? .black.opacity(0.2) : .clear, radius: 5, x: 0, y: 2)
                 }
                 .foregroundColor(.accentColor)
             }
-            .help("在浏览器中打开 https://github.com/xever/MacRenamer")
+            .onHover { hovering in
+                        // 加上动画让过渡更自然
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            isHovering = hovering
+                        }
+                    }
+//            .help("在浏览器中打开 \n https://github.com/xever/MacRenamer")
 
             // 版本号。
             Text(versionText)

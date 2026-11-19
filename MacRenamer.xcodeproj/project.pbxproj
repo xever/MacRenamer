@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,9 +15,7 @@
 		0000000000000000000000B6 /* RenameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000000000A6 /* RenameEngine.swift */; };
 		0000000000000000000000B7 /* RuleRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000000000A7 /* RuleRowView.swift */; };
 		0000000000000000000000B8 /* HistoryTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000000000A8 /* HistoryTextField.swift */; };
-		0000000000000000000000B9 /* logo.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0000000000000000000000AA /* logo.icns */; };
 		0000000000000000000000BA /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000000000AC /* AboutWindow.swift */; };
-		0000000000000000000000BB /* github.png in Resources */ = {isa = PBXBuildFile; fileRef = 0000000000000000000000AD /* github.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,11 +28,13 @@
 		0000000000000000000000A7 /* RuleRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleRowView.swift; sourceTree = "<group>"; };
 		0000000000000000000000A8 /* HistoryTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTextField.swift; sourceTree = "<group>"; };
 		0000000000000000000000A9 /* MacRenamer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacRenamer.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0000000000000000000000AA /* logo.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = logo.icns; sourceTree = "<group>"; };
 		0000000000000000000000AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0000000000000000000000AC /* AboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
-		0000000000000000000000AD /* github.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = github.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		EEF89B9630AF32F8009F60D9 /* image */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = image; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		0000000000000000000000E2 /* Frameworks */ = {
@@ -58,18 +58,17 @@
 		0000000000000000000000C2 /* MacRename */ = {
 			isa = PBXGroup;
 			children = (
+				EEF89B9630AF32F8009F60D9 /* image */,
+				0000000000000000000000AC /* AboutWindow.swift */,
 				0000000000000000000000A1 /* MacRenameApp.swift */,
-				0000000000000000000000A2 /* ContentView.swift */,
 				0000000000000000000000A3 /* AppSettings.swift */,
+				0000000000000000000000A2 /* ContentView.swift */,
 				0000000000000000000000A4 /* RenameRule.swift */,
 				0000000000000000000000A5 /* RenameItem.swift */,
 				0000000000000000000000A6 /* RenameEngine.swift */,
 				0000000000000000000000A7 /* RuleRowView.swift */,
 				0000000000000000000000A8 /* HistoryTextField.swift */,
-				0000000000000000000000AA /* logo.icns */,
 				0000000000000000000000AB /* Info.plist */,
-				0000000000000000000000AC /* AboutWindow.swift */,
-				0000000000000000000000AD /* github.png */,
 			);
 			path = MacRename;
 			sourceTree = "<group>";
@@ -96,6 +95,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EEF89B9630AF32F8009F60D9 /* image */,
 			);
 			name = MacRenamer;
 			productName = MacRename;
@@ -139,8 +141,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0000000000000000000000B9 /* logo.icns in Resources */,
-				0000000000000000000000BB /* github.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
