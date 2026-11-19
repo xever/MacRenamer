@@ -3,6 +3,8 @@
 一款用 Swift + SwiftUI 写的 macOS 重命名小工具，可直接用 Xcode 编译运行。
 界面参考了win平台的miniRenamer
 
+![界面](./doc/rename-shot.jpeg)
+
 ## 如何运行
 没有经过签名，如果提示异常。
 去“系统设置 -> 隐私与安全性”里手动点击“仍要打开”，
